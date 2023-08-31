@@ -15,59 +15,13 @@ class  imadHandler:
     version = 2023.08
 
 
-    def __init__(self, input_base_dir, output_base_dir, **kwargs) -> None:
+    def __init__(self, input, output, **kwargs) -> None:
 
         self.logger = kwargs.get("logger", logging.getLogger("root"))
         self.logger.info("=============This is IRMAD v%s==============" % self.version)
 
-        master = None
-        mad_instance_list = []
-
-        tiles = os.listdir(input_base_dir)
-        for tile in tiles:
-            out_dir = os.path.join(output_base_dir, tile)
-            if not os.path.exists(out_dir):
-                os.makedirs(out_dir)
-            
-            l3a_tile = os.path.join(input_base_dir, tile)
-            # Keep products dirs
-            l3a_dirs = [d for d in os.listdir(l3a_tile) if os.path.isdir(os.path.join(l3a_tile, d))]
-            # Using a lambda function within the sorted function
-            extract_date = lambda name: re.search(r'_(\d{8})-', name).group(1) if re.search(r'_(\d{8})-', name) else ""
-            l3a_products = sorted(l3a_dirs, key=extract_date)
-            for l3a in l3a_products:
-                l3a_path = os.path.join(l3a_tile, l3a)
-
-                # List all files in the directory
-                all_files = os.listdir(l3a_path)
-
-                # Filter files that have B2, B3, B4, B8
-                NRGB_bands = [fname for fname in all_files if any(band in fname for band in ['B2', 'B3', 'B4', 'B8.'])]
-
-                NRGB_file = self.create_geotiff(l3a_path, NRGB_bands)
-                
-                if master is not None:
-                    self.logger.info(f'******* Master image is: {master}.')
-                    self.logger.info(f'******* Slave image is: {NRGB_file}.')
-                    pname = NRGB_file.replace('NRGB', 'CHMAP')
-                    chmap_path = os.path.join(output_base_dir, pname)
-                    if not os.path.exists(chmap_path):
-                        self.logger.info(f'******* Write CHMAP raster file with id: {pname}.')
-                    
-                        # Create an actor process.
-                        imad = IRMAD.remote(master=master, slave=NRGB_file, output=output_base_dir, filename=pname, penalization=0.001)
-
-                    mad_instance_list.append(imad.MAD_iteration.remote())
-                
-                master = NRGB_file
-            master = None
-
-        chunks = [mad_instance_list[x:x+5] for x in range(0, len(mad_instance_list), 5)]
-
-        for chunk in chunks:
-            ray.get(chunk)
-            ready, not_ready = ray.wait(chunk, num_returns=len(chunk))
-            self.logger.info(ready, not_ready)
+        self.input_base_dir = input
+        self.output_base_dir = output
         
         return None
         
@@ -135,6 +89,60 @@ class  imadHandler:
         return output_file
 
 
+    def execute(self):
+        master = None
+        mad_instance_list = []
+
+        tiles = os.listdir(self.input_base_dir)
+        for tile in tiles:
+            out_dir = os.path.join(self.output_base_dir, tile)
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+            
+            l3a_tile = os.path.join(self.input_base_dir, tile)
+            # Keep products dirs
+            l3a_dirs = [d for d in os.listdir(l3a_tile) if os.path.isdir(os.path.join(l3a_tile, d))]
+            # Using a lambda function within the sorted function
+            extract_date = lambda name: re.search(r'_(\d{8})-', name).group(1) if re.search(r'_(\d{8})-', name) else ""
+            l3a_products = sorted(l3a_dirs, key=extract_date)
+            for l3a in l3a_products:
+                l3a_path = os.path.join(l3a_tile, l3a)
+
+                # List all files in the directory
+                all_files = os.listdir(l3a_path)
+
+                # Filter files that have B2, B3, B4, B8
+                NRGB_bands = [fname for fname in all_files if any(band in fname for band in ['B2', 'B3', 'B4', 'B8.'])]
+
+                NRGB_file = self.create_geotiff(l3a_path, NRGB_bands)
+                
+                if master is not None:
+                    self.logger.info(f'******* Master image is: {master}.')
+                    self.logger.info(f'******* Slave image is: {NRGB_file}.')
+                    pname = NRGB_file.replace('NRGB', 'CHMAP')
+                    chmap_path = os.path.join(self.output_base_dir, pname)
+                    if not os.path.exists(chmap_path):
+                        self.logger.info(f'******* Write CHMAP raster file with id: {pname}.')
+                    
+                        # Create an actor process.
+                        imad = IRMAD.remote(master=master, slave=NRGB_file, output=self.output_base_dir, 
+                                            filename=pname, penalization=0.001, logger=self.logger)
+
+                    mad_instance_list.append(imad.MAD_iteration.remote())
+                
+                master = NRGB_file
+            master = None
+
+        chunks = [mad_instance_list[x:x+5] for x in range(0, len(mad_instance_list), 5)]
+
+        for chunk in chunks:
+            ray.get(chunk)
+            ready, not_ready = ray.wait(chunk, num_returns=len(chunk))
+            self.logger.info(ready, not_ready)
+        
+        return True
+
+
 def main():
 
     parser = argparse.ArgumentParser(description="Perfrom IR-MAD change detection on bitemporal, multispectral imagery.")
@@ -155,7 +163,7 @@ def main():
     ray.init(num_cpus=args.cups, include_dashboard=False)
     logger.info(ray.is_initialized())
 
-    imad = imadHandler(args.input, args.output, logger=logger)
+    obj = imadHandler(args.input, args.output, logger=logger)
 
     ray.shutdown()
     logger.info(ray.is_initialized())

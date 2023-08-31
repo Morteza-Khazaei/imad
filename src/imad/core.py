@@ -4,18 +4,18 @@ from osgeo import gdal
 from osgeo.gdalconst import GA_ReadOnly, GDT_Float32
 import os, sys, math
 
-# import ray
+import ray
 
 
 from .utility import CPM
 
 
 
-# @ray.remote(num_cpus=2)
+@ray.remote(num_cpus=2)
 class IRMAD:
 
 
-    def __init__(self, master, slave, output, filename, out_fmt='GTiff', penalization=0.001):
+    def __init__(self, master, slave, output, filename, out_fmt='GTiff', penalization=0.001, logger=None):
 
         gdal.AllRegister()
         if output:
