@@ -119,6 +119,7 @@ class  imadHandler:
                 if master is not None:
                     pname = NRGB_file.replace('NRGB', 'CHMAP')
                     chmap_path = os.path.join(self.output_base_dir, pname)
+                    self.logger.info(f'-----> Check if CHMAP raster with id: {pname} exists.')
                     if not os.path.exists(chmap_path):
                         self.logger.info(f'******* Master image is: {master}.')
                         self.logger.info(f'******* Slave image is: {NRGB_file}.')
@@ -130,17 +131,10 @@ class  imadHandler:
 
                         mad_instance_list.append(imad.MAD_iteration.remote())
                 
-                        master = NRGB_file
+                    master = NRGB_file
             master = None
-
-        chunks = [mad_instance_list[x:x+5] for x in range(0, len(mad_instance_list), 5)]
-
-        for chunk in chunks:
-            ray.get(chunk)
-            ready, not_ready = ray.wait(chunk, num_returns=len(chunk))
-            self.logger.info(ready, not_ready)
         
-        return True
+        return mad_instance_list
 
 
 def main():
@@ -161,12 +155,16 @@ def main():
 
     # Start Ray.
     ray.init(num_cpus=args.cups, include_dashboard=False)
-    logger.info(ray.is_initialized())
+    logger.info(f'Ray is started: {ray.is_initialized()}')
 
     imad = imadHandler(args.input, args.output, logger=logger)
-    status = imad.execute()
-    if status:
-        logger.info('The process is done! ...')
+    mad_instances = imad.execute()
+    chunks = [mad_instances[x:x+5] for x in range(0, len(mad_instances), 5)]
+
+    for chunk in chunks:
+        ray.get(chunk)
+        ready, not_ready = ray.wait(chunk, num_returns=len(chunk))
+        logger.info(ready, not_ready)
 
     ray.shutdown()
-    logger.info(ray.is_initialized())
+    logger.info(f'Ray is shutdown: {ray.is_initialized()}')
