@@ -7,8 +7,8 @@ from osgeo import gdal
 from .core import IRMAD
 
 
-# Start Ray.
-ray.init(num_cpus=12)
+
+
 
 
 def create_geotiff(base_dir, input_files):
@@ -54,6 +54,7 @@ def main():
 
     # Start Ray.
     ray.init(num_cpus=args.cups, include_dashboard=False)
+    assert ray.is_initialized()
 
     input_base_dir = args.input
     output_base_dir = args.output
