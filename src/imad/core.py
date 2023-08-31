@@ -18,6 +18,8 @@ class IRMAD:
     def __init__(self, master, slave, output, filename, out_fmt='GTiff', penalization=0.001, logger=None):
 
         gdal.AllRegister()
+
+        self.logger = logger
         if output:
             os.chdir(output)
 
@@ -227,5 +229,5 @@ class IRMAD:
             outDataset = None
             inDataset1 = None
             inDataset2 = None
-            print('result written to: ' + self.outfile)
-            print('-----------------done---------------------')
+            self.logger.info('result written to: ' + self.outfile)
+            self.logger.info('-----------------done---------------------')
