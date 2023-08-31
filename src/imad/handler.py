@@ -117,20 +117,20 @@ class  imadHandler:
                 NRGB_file = self.create_geotiff(l3a_path, NRGB_bands)
                 
                 if master is not None:
-                    self.logger.info(f'******* Master image is: {master}.')
-                    self.logger.info(f'******* Slave image is: {NRGB_file}.')
                     pname = NRGB_file.replace('NRGB', 'CHMAP')
                     chmap_path = os.path.join(self.output_base_dir, pname)
                     if not os.path.exists(chmap_path):
+                        self.logger.info(f'******* Master image is: {master}.')
+                        self.logger.info(f'******* Slave image is: {NRGB_file}.')
                         self.logger.info(f'******* Write CHMAP raster file with id: {pname}.')
                     
                         # Create an actor process.
                         imad = IRMAD.remote(master=master, slave=NRGB_file, output=self.output_base_dir, 
                                             filename=pname, penalization=0.001, logger=self.logger)
 
-                    mad_instance_list.append(imad.MAD_iteration.remote())
+                        mad_instance_list.append(imad.MAD_iteration.remote())
                 
-                master = NRGB_file
+                    master = NRGB_file
             master = None
 
         chunks = [mad_instance_list[x:x+5] for x in range(0, len(mad_instance_list), 5)]
