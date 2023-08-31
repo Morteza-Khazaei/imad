@@ -9,7 +9,6 @@ from .core import IRMAD
 
 # Start Ray.
 ray.init(num_cpus=12)
-assert ray.is_initialized()
 
 
 def create_geotiff(base_dir, input_files):
@@ -53,15 +52,9 @@ def main():
 
     args = parser.parse_args()
 
-    cpus = args.cups
-
     # Start Ray.
-    if cpus > 12:
-        ray.shutdown()
-        assert not ray.is_initialized()
-        
-        ray.init(num_cpus=cpus)
-        assert ray.is_initialized()
+    ray.init(num_cpus=args.cups, port=6379)
+    assert ray.is_initialized()
 
     input_base_dir = args.input
     output_base_dir = args.output
