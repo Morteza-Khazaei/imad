@@ -28,7 +28,7 @@ def create_geotiff(base_dir, input_files):
     
     # Create a new dataset for the NRGB bands
     driver = gdal.GetDriverByName("GTiff")
-    ds_out = driver.Create(output_file, band[0].XSize, band[0].YSize, len(bands), bands[0].DataType)
+    ds_out = driver.Create(output_file, bands[0].XSize, bands[0].YSize, len(bands), bands[0].DataType)
 
     # Loop through the bands and write them to the output dataset
     for i, band in enumerate(bands):
