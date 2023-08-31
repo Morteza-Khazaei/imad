@@ -54,7 +54,7 @@ class  imadHandler:
         # Open each input file, extract the band, and append it to the bands list
         for file in input_files:
             file_path = os.path.join(base_dir, file)
-            self.logger.info(f'******* Read raster file with Id: {file}')
+            self.logger.info(f'Read raster band with Id: {file}')
             ds = gdal.Open(file_path, gdal.GA_ReadOnly)
             cols = ds.RasterXSize
             rows = ds.RasterYSize
