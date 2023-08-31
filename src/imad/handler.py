@@ -101,7 +101,3 @@ def main():
         ray.get(chunk)
         ready, not_ready = ray.wait(chunk, num_returns=len(chunk))
         print(ready, not_ready)
-
-
-if __name__ == '__main__':
-    main()
