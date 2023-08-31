@@ -50,6 +50,8 @@ def main():
 
     args = parser.parse_args()
 
+    print(args.cups, args.input, args.output)
+
     # Start Ray.
     ray.init(num_cpus=args.cups)
     assert ray.is_initialized()
