@@ -71,6 +71,7 @@ def main():
             os.makedirs(out_dir)
         
         l3a_tile = os.path.join(input_base_dir, tile)
+        print('l3a_tile:', l3a_tile)
         # Keep products dirs
         l3a_dirs = [d for d in os.listdir(l3a_tile) if os.path.isdir(d)]
         print('l3a_dirs:', l3a_dirs)
