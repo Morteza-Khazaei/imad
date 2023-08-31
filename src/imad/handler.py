@@ -14,8 +14,6 @@ from .core import IRMAD
 def create_geotiff(base_dir, input_files):
     # Create a list to store the individual bands
     bands = []
-    cols_list = []
-    rows_list = []
 
     # Open each input file, extract the band, and append it to the bands list
     for file in input_files:
@@ -29,12 +27,10 @@ def create_geotiff(base_dir, input_files):
 
         if ds is not None:
             band = ds.GetRasterBand(1)  # Get the first (and only) band
-            bands.append(band)
-            cols_list.append(cols)
-            rows_list.append(rows)
+            bands.append(band.ReadAsArray())
+            print(bands[-1].shape)
             ds = None  # Close the dataset
     # Create NRGB name
-    print(cols_list, rows_list)
     fname = re.sub(r'B\d+', 'NRGB', file)
     output_file = os.path.join(base_dir, fname)
 
@@ -50,7 +46,7 @@ def create_geotiff(base_dir, input_files):
         # Loop through the bands and write them to the output dataset
         for i, band in enumerate(bands):
             output_band = ds_out.GetRasterBand(i + 1)  # Band numbers start from 1
-            output_band.WriteArray(band.ReadAsArray())
+            output_band.WriteArray(band)
 
         # Close the output dataset
         ds_out = None
