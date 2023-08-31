@@ -18,7 +18,7 @@ class  imadHandler:
     def __init__(self, input, output, **kwargs) -> None:
 
         self.logger = kwargs.get("logger", logging.getLogger("root"))
-        self.logger.info("=============This is IRMAD v%s==============" % self.version)
+        self.logger.info(f'======================= This is IRMAD v{self.version} ======================')
 
         self.input_base_dir = input
         self.output_base_dir = output
@@ -120,7 +120,7 @@ class  imadHandler:
                     pname = NRGB_file.replace('NRGB', 'CHMAP')
                     chmap_path = os.path.join(self.output_base_dir, pname)
                     self.logger.info(f'-----> Check if CHMAP raster with id: {pname} exists.')
-                    if not os.path.exists(chmap_path):
+                    if not os.path.isfile(chmap_path):
                         self.logger.info(f'******* Master image is: {master}.')
                         self.logger.info(f'******* Slave image is: {NRGB_file}.')
                         self.logger.info(f'******* Write CHMAP raster file with id: {pname}.')
@@ -131,7 +131,7 @@ class  imadHandler:
 
                         mad_instance_list.append(imad.MAD_iteration.remote())
                 
-                    master = NRGB_file
+                master = NRGB_file
             master = None
         
         return mad_instance_list
