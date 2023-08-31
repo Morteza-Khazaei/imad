@@ -17,7 +17,7 @@ def create_geotiff(base_dir, input_files):
 
     # Open each input file, extract the band, and append it to the bands list
     for file in input_files:
-        ds = gdal.Open(file, gdal.GA_ReadOnly)
+        ds = gdal.Open(os.path.join(base_dir, file), gdal.GA_ReadOnly)
         if ds is not None:
             band = ds.GetRasterBand(1)  # Get the first (and only) band
             bands.append(band)
