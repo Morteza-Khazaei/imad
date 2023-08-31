@@ -53,7 +53,7 @@ def main():
     args = parser.parse_args()
 
     # Start Ray.
-    ray.init(num_cpus=args.cups, port=6379)
+    ray.init(num_cpus=args.cups, include_dashboard=False)
     assert ray.is_initialized()
 
     input_base_dir = args.input
