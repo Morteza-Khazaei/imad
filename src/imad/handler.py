@@ -18,7 +18,7 @@ def create_geotiff(base_dir, input_files):
     # Open each input file, extract the band, and append it to the bands list
     for file in input_files:
         file_path = os.path.join(base_dir, file)
-        print(f'******* Read raster file with Id: {file_path}')
+        print(f'******* Read raster file with Id: {file}')
         ds = gdal.Open(file_path, gdal.GA_ReadOnly)
         cols = ds.RasterXSize
         rows = ds.RasterYSize
@@ -28,7 +28,6 @@ def create_geotiff(base_dir, input_files):
         if ds is not None:
             band = ds.GetRasterBand(1)  # Get the first (and only) band
             bands.append(band.ReadAsArray())
-            print(bands[-1].shape)
             ds = None  # Close the dataset
     # Create NRGB name
     fname = re.sub(r'B\d+', 'NRGB', file)
@@ -38,7 +37,7 @@ def create_geotiff(base_dir, input_files):
         print(f'******* Write raster file with id: {fname}.')
         # Create a new dataset for the NRGB bands
         driver = gdal.GetDriverByName("GTiff")
-        ds_out = driver.Create(output_file, cols, rows, len(bands), band.DataType)
+        ds_out = driver.Create(output_file, cols, rows, len(bands), band.DataType, options=['COMPRESS=LZW'])
         ds_out.SetGeoTransform(geotransform)
         if projection is not None:
             ds_out.SetProjection(projection)
@@ -105,11 +104,14 @@ def main():
             NRGB_file = create_geotiff(l3a_path, NRGB_bands)
             
             if master:
-                product_name = re.sub(r'NRGB\d+', perfix, NRGB_file)
+                pname = re.sub(r'NRGB\d+', perfix, NRGB_file)
+                chmap_path = os.path.join(output_base_dir, pname)
+                if not os.path.exists(chmap_path):
+                    print(f'******* Write CHMAP raster file with id: {pname}.')
                 
                 # Create an actor process.
                 # imad = IRMAD.remote(master=master, slave=NRGB_file, output=output_base_dir, filename=product_name, penalization=0.001)
-                imad = IRMAD(master=master, slave=NRGB_file, output=output_base_dir, filename=product_name, penalization=0.001)
+                imad = IRMAD(master=master, slave=NRGB_file, output=output_base_dir, filename=pname, penalization=0.001)
                 imad.MAD_iteration()
 
                 # mad_instance_list.append(imad.MAD_iteration.remote())

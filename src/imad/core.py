@@ -4,7 +4,7 @@ from osgeo import gdal
 from osgeo.gdalconst import GA_ReadOnly, GDT_Float32
 import os, sys, math
 
-import ray
+# import ray
 
 
 from .utility import CPM
