@@ -2,7 +2,6 @@ import os
 import re
 import argparse
 import ray
-import asyncio
 from osgeo import gdal
 
 from .core import IRMAD
