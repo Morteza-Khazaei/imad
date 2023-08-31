@@ -73,9 +73,11 @@ def main():
         l3a_tile = os.path.join(input_base_dir, tile)
         # Keep products dirs
         l3a_dirs = [d for d in os.listdir(l3a_tile) if os.path.isdir(d)]
+        print('l3a_dirs:', l3a_dirs)
         # Using a lambda function within the sorted function
         extract_date = lambda name: re.search(r'_(\d{8})-', name).group(1) if re.search(r'_(\d{8})-', name) else ""
         l3a_products = sorted(l3a_dirs, key=extract_date)
+        print('l3a_products:', l3a_products)
         for l3a in l3a_products:
             l3a_path = os.path.join(l3a_tile, l3a)
 
