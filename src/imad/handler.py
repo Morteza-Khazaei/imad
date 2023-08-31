@@ -117,7 +117,8 @@ class  imadHandler:
                 NRGB_file = self.create_geotiff(l3a_path, NRGB_bands)
                 
                 if master is not None:
-                    pname = NRGB_file.replace('NRGB', 'CHMAP')
+                    head, tail = os.path.split(NRGB_file)
+                    pname = tail.replace('NRGB', 'CHMAP')
                     chmap_path = os.path.join(out_dir, pname)
                     self.logger.info(f'-----> Check if CHMAP raster with id: {pname} exists.')
                     if not os.path.isfile(chmap_path):
