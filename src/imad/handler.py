@@ -30,7 +30,8 @@ def create_geotiff(base_dir, input_files):
     output_file = os.path.join(base_dir, fname)
 
     if not os.path.exists(output_file):
-        print(f'******* Write raster file with id: {output_file}.')
+        print(f'******* Write raster file with id: {fname}.')
+        print(bands[0].XSize, bands[0].YSize, len(bands), bands[0].DataType)
         # Create a new dataset for the NRGB bands
         driver = gdal.GetDriverByName("GTiff")
         ds_out = driver.Create(output_file, bands[0].XSize, bands[0].YSize, len(bands), bands[0].DataType)
