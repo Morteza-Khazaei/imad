@@ -71,9 +71,7 @@ def main():
     input_base_dir = args.input
     output_base_dir = args.output
 
-    perfix = 'CHMAP'
     master = None
-
     mad_instance_list = []
 
     tiles = os.listdir(input_base_dir)
@@ -104,17 +102,17 @@ def main():
             NRGB_file = create_geotiff(l3a_path, NRGB_bands)
             
             if master is not None:
-                print(f'******* Master raster image is: {master}.')
-                print(f'******* Slave raster image is: {NRGB_file}.')
-                pname = re.sub(r'NRGB\d+', perfix, NRGB_file)
+                print(f'******* Master image is: {master}.')
+                print(f'******* Slave image is: {NRGB_file}.')
+                pname = NRGB_file.replace('NRGB', 'CHMAP')
                 chmap_path = os.path.join(output_base_dir, pname)
                 if not os.path.exists(chmap_path):
                     print(f'******* Write CHMAP raster file with id: {pname}.')
                 
-                # Create an actor process.
-                # imad = IRMAD.remote(master=master, slave=NRGB_file, output=output_base_dir, filename=product_name, penalization=0.001)
-                imad = IRMAD(master=master, slave=NRGB_file, output=output_base_dir, filename=pname, penalization=0.001)
-                imad.MAD_iteration()
+                    # Create an actor process.
+                    # imad = IRMAD.remote(master=master, slave=NRGB_file, output=output_base_dir, filename=product_name, penalization=0.001)
+                    imad = IRMAD(master=master, slave=NRGB_file, output=output_base_dir, filename=pname, penalization=0.001)
+                    imad.MAD_iteration()
 
                 # mad_instance_list.append(imad.MAD_iteration.remote())
             
