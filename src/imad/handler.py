@@ -130,7 +130,7 @@ class  imadHandler:
 
                         mad_instance_list.append(imad.MAD_iteration.remote())
                 
-                    master = NRGB_file
+                        master = NRGB_file
             master = None
 
         chunks = [mad_instance_list[x:x+5] for x in range(0, len(mad_instance_list), 5)]
