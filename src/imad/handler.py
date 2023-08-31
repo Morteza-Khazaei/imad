@@ -118,7 +118,7 @@ class  imadHandler:
                 
                 if master is not None:
                     pname = NRGB_file.replace('NRGB', 'CHMAP')
-                    chmap_path = os.path.join(self.output_base_dir, pname)
+                    chmap_path = os.path.join(out_dir, pname)
                     self.logger.info(f'-----> Check if CHMAP raster with id: {pname} exists.')
                     if not os.path.isfile(chmap_path):
                         self.logger.info(f'******* Master image is: {master}.')
@@ -126,7 +126,7 @@ class  imadHandler:
                         self.logger.info(f'******* Write CHMAP raster file with id: {pname}.')
                     
                         # Create an actor process.
-                        imad = IRMAD.remote(master=master, slave=NRGB_file, output=self.output_base_dir, 
+                        imad = IRMAD.remote(master=master, slave=NRGB_file, output=out_dir, 
                                             filename=pname, penalization=0.001, logger=self.logger)
 
                         mad_instance_list.append(imad.MAD_iteration.remote())
