@@ -52,6 +52,7 @@ def main():
 
     # Start Ray.
     ray.init(num_cpus=args.cups)
+    assert ray.is_initialized()
 
     input_base_dir = args.input
     output_base_dir = args.output
@@ -101,3 +102,6 @@ def main():
         ray.get(chunk)
         ready, not_ready = ray.wait(chunk, num_returns=len(chunk))
         print(ready, not_ready)
+    
+    ray.shutdown()
+    assert not ray.is_initialized()
