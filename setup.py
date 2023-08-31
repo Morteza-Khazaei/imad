@@ -30,7 +30,7 @@ setup(
     install_requires = requirements,
     entry_points ={
         'console_scripts': [
-            'imad = imad.core:main'
+            'IRMAD = imad.handler:main'
         ]
     },
     classifiers=[

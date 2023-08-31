@@ -7,7 +7,7 @@ import os, sys, math
 import ray
 
 
-from IMAD.utiles import CPM
+from .utility import CPM
 
 
 

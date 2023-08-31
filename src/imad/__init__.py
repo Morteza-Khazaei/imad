@@ -1,2 +1,2 @@
 from .core import IRMAD
-from .utiles import CPM
+from .utility import CPM
