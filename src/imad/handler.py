@@ -18,25 +18,25 @@ def create_geotiff(base_dir, input_files):
     # Open each input file, extract the band, and append it to the bands list
     for file in input_files:
         ds = gdal.Open(file, gdal.GA_ReadOnly)
-        if dataset is not None:
-            band = dataset.GetRasterBand(1)  # Get the first (and only) band
+        if ds is not None:
+            band = ds.GetRasterBand(1)  # Get the first (and only) band
             bands.append(band)
-            dataset = None  # Close the dataset
+            ds = None  # Close the dataset
     # Create NRGB name
     fname = re.sub(r'B\d+', 'NRGB', file)
     output_file = os.path.join(base_dir, fname)
     
     # Create a new dataset for the NRGB bands
     driver = gdal.GetDriverByName("GTiff")
-    output_dataset = driver.Create(output_file, band[0].XSize, band[0].YSize, len(bands), bands[0].DataType)
+    ds_out = driver.Create(output_file, band[0].XSize, band[0].YSize, len(bands), bands[0].DataType)
 
     # Loop through the bands and write them to the output dataset
     for i, band in enumerate(bands):
-        output_band = output_dataset.GetRasterBand(i + 1)  # Band numbers start from 1
+        output_band = ds_out.GetRasterBand(i + 1)  # Band numbers start from 1
         output_band.WriteArray(band.ReadAsArray())
 
     # Close the output dataset
-    output_dataset = None
+    ds_out = None
 
     return output_file
 
