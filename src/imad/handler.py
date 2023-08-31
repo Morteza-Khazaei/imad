@@ -20,6 +20,10 @@ def create_geotiff(base_dir, input_files):
         file_path = os.path.join(base_dir, file)
         print(f'******* Read raster file with Id: {file_path}')
         ds = gdal.Open(file_path, gdal.GA_ReadOnly)
+        cols = ds.RasterXSize
+        rows = ds.RasterYSize
+        geotransform = ds.GetGeoTransform()
+        projection = ds.GetProjection()
 
         if ds is not None:
             band = ds.GetRasterBand(1)  # Get the first (and only) band
@@ -31,10 +35,13 @@ def create_geotiff(base_dir, input_files):
 
     if not os.path.exists(output_file):
         print(f'******* Write raster file with id: {fname}.')
-        print(bands[0].XSize, bands[0].YSize, len(bands), bands[0].DataType)
+        print(bands[0].XSize, bands[0].YSize, len(bands), bands[0].DataType, gdal.GetDataTypeName(band.DataType))
         # Create a new dataset for the NRGB bands
         driver = gdal.GetDriverByName("GTiff")
-        ds_out = driver.Create(output_file, bands[0].XSize, bands[0].YSize, len(bands), bands[0].DataType)
+        ds_out = driver.Create(output_file, cols, rows, len(bands), gdal.GetDataTypeName(band.DataType))
+        ds_out.SetGeoTransform(geotransform)
+        if projection is not None:
+            ds_out.SetProjection(projection)
 
         # Loop through the bands and write them to the output dataset
         for i, band in enumerate(bands):
