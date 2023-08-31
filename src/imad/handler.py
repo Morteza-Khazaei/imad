@@ -7,6 +7,9 @@ from osgeo import gdal
 from .core import IRMAD
 
 
+# Start Ray.
+ray.init(num_cpus=12)
+assert ray.is_initialized()
 
 
 def create_geotiff(base_dir, input_files):
@@ -50,11 +53,15 @@ def main():
 
     args = parser.parse_args()
 
-    print(args.cups, args.input, args.output)
+    cpus = args.cups
 
     # Start Ray.
-    ray.init(num_cpus=args.cups)
-    assert ray.is_initialized()
+    if cpus > 12:
+        ray.shutdown()
+        assert not ray.is_initialized()
+        
+        ray.init(num_cpus=cpus)
+        assert ray.is_initialized()
 
     input_base_dir = args.input
     output_base_dir = args.output
