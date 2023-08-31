@@ -163,7 +163,10 @@ def main():
     ray.init(num_cpus=args.cups, include_dashboard=False)
     logger.info(ray.is_initialized())
 
-    obj = imadHandler(args.input, args.output, logger=logger)
+    imad = imadHandler(args.input, args.output, logger=logger)
+    status = imad.execute()
+    if status:
+        logger.info('The process is done! ...')
 
     ray.shutdown()
     logger.info(ray.is_initialized())
