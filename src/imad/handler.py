@@ -1,7 +1,7 @@
 import os
 import re
 import argparse
-import ray
+# import ray
 from osgeo import gdal
 
 from .core import IRMAD
@@ -52,9 +52,9 @@ def main():
 
     args = parser.parse_args()
 
-    # Start Ray.
-    ray.init(num_cpus=args.cups, include_dashboard=False)
-    assert ray.is_initialized()
+    # # Start Ray.
+    # ray.init(num_cpus=args.cups, include_dashboard=False)
+    # assert ray.is_initialized()
 
     input_base_dir = args.input
     output_base_dir = args.output
@@ -91,19 +91,21 @@ def main():
                 product_name = re.sub(r'NRGB\d+', perfix, NRGB_file)
                 
                 # Create an actor process.
-                imad = IRMAD.remote(master=master, slave=NRGB_file, output=output_base_dir, filename=product_name, penalization=0.001)
+                # imad = IRMAD.remote(master=master, slave=NRGB_file, output=output_base_dir, filename=product_name, penalization=0.001)
+                imad = IRMAD(master=master, slave=NRGB_file, output=output_base_dir, filename=product_name, penalization=0.001)
+                imad.MAD_iteration()
 
-                mad_instance_list.append(imad.MAD_iteration.remote())
+                # mad_instance_list.append(imad.MAD_iteration.remote())
             
             master = NRGB_file
         master = None
 
-    chunks = [mad_instance_list[x:x+5] for x in range(0, len(mad_instance_list), 5)]
+    # chunks = [mad_instance_list[x:x+5] for x in range(0, len(mad_instance_list), 5)]
 
-    for chunk in chunks:
-        ray.get(chunk)
-        ready, not_ready = ray.wait(chunk, num_returns=len(chunk))
-        print(ready, not_ready)
+    # for chunk in chunks:
+    #     ray.get(chunk)
+    #     ready, not_ready = ray.wait(chunk, num_returns=len(chunk))
+    #     print(ready, not_ready)
     
-    ray.shutdown()
-    assert not ray.is_initialized()
+    # ray.shutdown()
+    # assert not ray.is_initialized()

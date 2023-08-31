@@ -11,7 +11,7 @@ from .utility import CPM
 
 
 
-@ray.remote(num_cpus=2)
+# @ray.remote(num_cpus=2)
 class IRMAD:
 
 
