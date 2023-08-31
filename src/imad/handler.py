@@ -86,7 +86,7 @@ def main():
             all_files = os.listdir(l3a_path)
 
             # Filter files that have B2, B3, B4, B8
-            NRGB_bands = [fname for fname in all_files if any(band in fname for band in ['B2', 'B3', 'B4', 'B8'])]
+            NRGB_bands = [fname for fname in all_files if any(band in fname for band in ['B2', 'B3', 'B4', 'B8.'])]
 
             NRGB_file = create_geotiff(l3a_path, NRGB_bands)
             
