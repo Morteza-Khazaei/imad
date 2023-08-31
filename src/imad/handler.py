@@ -103,7 +103,9 @@ def main():
 
             NRGB_file = create_geotiff(l3a_path, NRGB_bands)
             
-            if master:
+            if master is not None:
+                print(f'******* Master raster image is: {master}.')
+                print(f'******* Slave raster image is: {NRGB_file}.')
                 pname = re.sub(r'NRGB\d+', perfix, NRGB_file)
                 chmap_path = os.path.join(output_base_dir, pname)
                 if not os.path.exists(chmap_path):
