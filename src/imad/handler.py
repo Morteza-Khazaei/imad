@@ -35,11 +35,10 @@ def create_geotiff(base_dir, input_files):
 
     if not os.path.exists(output_file):
         print(f'******* Write raster file with id: {fname}.')
-        dtype = gdal.GetDataTypeName(band.DataType)
-        print(bands[0].XSize, bands[0].YSize, len(bands), bands[0].DataType, gdal.GetDataTypeName(dtype))
+        print(bands[3].XSize, bands[3].YSize, len(bands), bands[3].DataType, gdal.GetDataTypeName(band.DataType))
         # Create a new dataset for the NRGB bands
         driver = gdal.GetDriverByName("GTiff")
-        ds_out = driver.Create(output_file, cols, rows, len(bands), gdal.GetDataTypeName(dtype))
+        ds_out = driver.Create(output_file, cols, rows, len(bands), gdal.GetDataTypeName(band.DataType))
         ds_out.SetGeoTransform(geotransform)
         if projection is not None:
             ds_out.SetProjection(projection)
