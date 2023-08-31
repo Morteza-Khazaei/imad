@@ -38,7 +38,7 @@ def create_geotiff(base_dir, input_files):
         print(bands[3].XSize, bands[3].YSize, len(bands), bands[3].DataType, gdal.GetDataTypeName(band.DataType))
         # Create a new dataset for the NRGB bands
         driver = gdal.GetDriverByName("GTiff")
-        ds_out = driver.Create(output_file, cols, rows, len(bands), gdal.GetDataTypeName(band.DataType))
+        ds_out = driver.Create(output_file, cols, rows, len(bands), band.DataType)
         ds_out.SetGeoTransform(geotransform)
         if projection is not None:
             ds_out.SetProjection(projection)
