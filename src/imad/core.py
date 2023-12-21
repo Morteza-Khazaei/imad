@@ -84,6 +84,7 @@ class IRMAD:
     def _geneiv(self, A, B):
         # solves A*x = lambda*B*x for numpy matrices A and B,
         # returns eigenvectors in columns
+        B = np.nan_to_num(B, nan=0., posinf=1e9, neginf=-1e9)
         Li = linalg.inv(self._choldc(B))
         C = Li * A * (Li.transpose())
         C = np.asmatrix((C + C.transpose()) * 0.5, np.float32)
