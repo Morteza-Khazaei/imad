@@ -163,9 +163,13 @@ def main():
     chunks = [mad_instances[x:x+5] for x in range(0, len(mad_instances), 5)]
 
     for chunk in chunks:
-        ray.get(chunk)
-        ready, not_ready = ray.wait(chunk, num_returns=len(chunk))
-        logger.info(ready, not_ready)
+        try:
+            ray.get(chunk)
+            ready, not_ready = ray.wait(chunk, num_returns=len(chunk))
+            logger.info(ready, not_ready)
+        except ValueError as e:
+            logger.info(f'This {chunk} could not be executed because of this error: {e}')
+
 
     ray.shutdown()
     logger.info(f'Ray is shutdown: {ray.is_initialized()}')
