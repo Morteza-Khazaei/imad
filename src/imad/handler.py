@@ -130,7 +130,7 @@ class  imadHandler:
                         imad = IRMAD.remote(master=master, slave=NRGB_file, output=out_dir, 
                                             filename=pname, penalization=0.001, logger=self.logger)
 
-                        mad_instance_list.append(imad.MAD_iteration.remote())
+                        mad_instance_list.append((imad.MAD_iteration.remote(), [os.path.basename(master), os.path.basename(NRGB_file)]))
                 
                 master = NRGB_file
             master = None
@@ -164,11 +164,11 @@ def main():
 
     for chunk in chunks:
         try:
-            ray.get(chunk)
-            ready, not_ready = ray.wait(chunk, num_returns=len(chunk))
+            ray.get(chunk[0])
+            ready, not_ready = ray.wait(chunk[0], num_returns=len(chunk[0]))
             logger.info(ready, not_ready)
         except ValueError as e:
-            logger.info(f'This {chunk} could not be executed because of this error: {e}')
+            logger.info(f'This {chunk[1]} could not be executed because of this error: {e}')
 
 
     ray.shutdown()
