@@ -5,6 +5,7 @@ import ray
 import argparse
 import logging
 from osgeo import gdal
+import numpy as np
 
 from .core import IRMAD
 
@@ -63,7 +64,10 @@ class  imadHandler:
 
             if ds is not None:
                 band = ds.GetRasterBand(1)  # Get the first (and only) band
-                bands.append(band.ReadAsArray())
+                nodata = band.GetNoDataValue()
+                band_array = band.ReadAsArray()
+                band_array[band_array == np.nan] = -10000.
+                bands.append(band_array)
                 ds = None  # Close the dataset
         # Create NRGB name
         fname = re.sub(r'B\d+', 'NRGB', file)
@@ -82,6 +86,7 @@ class  imadHandler:
             for i, band in enumerate(bands):
                 output_band = ds_out.GetRasterBand(i + 1)  # Band numbers start from 1
                 output_band.WriteArray(band)
+                output_band.SetNoDataValue(nodata)
 
             # Close the output dataset
             ds_out = None
