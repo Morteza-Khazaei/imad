@@ -66,14 +66,14 @@ class  imadHandler:
                 band = ds.GetRasterBand(1)  # Get the first (and only) band
                 nodata = band.GetNoDataValue()
                 band_array = band.ReadAsArray()
-                band_array[band_array == np.nan] = -10000.
+                band_array[band_array == np.nan] = -10000
                 bands.append(band_array)
                 ds = None  # Close the dataset
         # Create NRGB name
         fname = re.sub(r'B\d+', 'NRGB', file)
         output_file = os.path.join(base_dir, fname)
 
-        if os.path.exists(output_file):
+        if not os.path.exists(output_file):
             self.logger.info(f'******* Write raster file with id: {fname}.')
             # Create a new dataset for the NRGB bands
             driver = gdal.GetDriverByName("GTiff")
