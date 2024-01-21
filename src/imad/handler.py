@@ -73,7 +73,7 @@ class  imadHandler:
         fname = re.sub(r'B\d+', 'NRGB', file)
         output_file = os.path.join(base_dir, fname)
 
-        if not os.path.exists(output_file):
+        if os.path.exists(output_file):
             self.logger.info(f'******* Write raster file with id: {fname}.')
             # Create a new dataset for the NRGB bands
             driver = gdal.GetDriverByName("GTiff")
