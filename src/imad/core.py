@@ -1,5 +1,5 @@
 import numpy as np
-from scipy import stats
+from scipy import linalg, stats
 from osgeo import gdal
 from osgeo.gdalconst import GA_ReadOnly, GDT_Float32
 import os, sys, math
@@ -85,12 +85,9 @@ class IRMAD:
         # solves A*x = lambda*B*x for numpy matrices A and B,
         # returns eigenvectors in columns
         # B = np.nan_to_num(B, nan=0., posinf=1e9, neginf=-1e9)
-        Li = np.linalg.inv(self._choldc(B))
+        Li = linalg.inv(self._choldc(B))
         C = Li * A * (Li.transpose())
         C = np.asmatrix((C + C.transpose()) * 0.5, np.float32)
-        # C[C == np.nan] = 0.
-        # C[C == np.inf] = 0.
-        print(C)
         eivs, V = np.linalg.eig(C)
         return eivs, Li.transpose() * V
 
@@ -150,9 +147,9 @@ class IRMAD:
                 # [2023-12-20, 22:40:22 EST] {subprocess.py:93} INFO - ValueError: array must not contain infs or NaNs
                 # s22 = np.nan_to_num(s22, nan=0., posinf=1e9, neginf=-1e9)
                 # s11 = np.nan_to_num(s11, nan=0., posinf=1e9, neginf=-1e9)
-                c1 = s12 * np.linalg.inv(s22) * s21
+                c1 = s12 * linalg.inv(s22) * s21
                 b1 = s11
-                c2 = s21 * np.linalg.inv(s11) * s12
+                c2 = s21 * linalg.inv(s11) * s12
                 b2 = s22
 
                 # solution of generalized eigen problems
