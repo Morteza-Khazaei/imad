@@ -88,8 +88,9 @@ class IRMAD:
         Li = np.linalg.inv(self._choldc(B))
         C = Li * A * (Li.transpose())
         C = np.asmatrix((C + C.transpose()) * 0.5, np.float32)
-        C[C == np.nan] = 0.
-        C[C == np.inf] = 0.
+        # C[C == np.nan] = 0.
+        # C[C == np.inf] = 0.
+        print(C)
         eivs, V = np.linalg.eig(C)
         return eivs, Li.transpose() * V
 
